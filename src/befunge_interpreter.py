@@ -84,9 +84,9 @@ def befunge_interpreter(grid: list[list[str]]) -> None:
         # TODO: implement the rest instructions
         pass
     def step() -> None:
-        while grid[ip_y][ip_x] != end_program:
-            interpret(grid[ip_y][ip_x])
-            move_ip()
+        if grid[ip_y][ip_x] == end_program: return
+        interpret(grid[ip_y][ip_x])
+        move_ip()
 
     return step()
 
