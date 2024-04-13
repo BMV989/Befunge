@@ -16,6 +16,12 @@ def befunge_interpreter(grid: list[list[str]]) -> None:
     ip_directions = ["right", "left", "up", "down"]
     end_program = "@"
 
+    def safe_pop(s: list):
+        try:
+            return s.pop()
+        except IndexError:
+            return 0
+
     def move_ip() -> None:
         nonlocal ip_x, ip_y
         if ip_direction == ip_directions[0]:
@@ -98,8 +104,7 @@ def befunge_interpreter(grid: list[list[str]]) -> None:
 
         elif instruction == "_":
             # POP; RIGHT IF 0, LEFT OTHERWISE
-            try: value = stack.pop()
-            except IndexError: value = 0
+            value = safe_pop(stack)
             if value == 0:
                 ip_direction = ip_directions[0]
             else:
@@ -119,14 +124,16 @@ def befunge_interpreter(grid: list[list[str]]) -> None:
 
         elif instruction == ":":
             # DUPLICATE VALUE ON TOP OF STACK
-            try: value = stack[-1]
-            except IndexError: value = 0
+            try:
+                value = stack[-1]
+            except IndexError:
+                value = 0
             stack.append(value)
 
         elif instruction == "\\":
             # SWAP TWO VALUES ON TOP OF STACK
             a = stack.pop()
-            b = stack.pop()
+            b = safe_pop(stack)
             stack.append(a)
             stack.append(b)
 
