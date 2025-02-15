@@ -6,6 +6,8 @@ def parse_befunge_file(filename: str) -> list[list[str]]:
     with open(filename) as f:
         return [[char for char in line.rstrip()] for line in f]
 
+_IP_DIRECTIONS = ["right", "left", "up", "down"]
+_END_PROGRAM = "@"
 
 def befunge_interpreter(grid: list[list[str]]) -> None:
     ip_x = 0
@@ -13,8 +15,6 @@ def befunge_interpreter(grid: list[list[str]]) -> None:
     ip_direction = "right"
     stack = []
     string_mode = False
-    ip_directions = ["right", "left", "up", "down"]
-    end_program = "@"
 
     def safe_pop():
         try:
@@ -24,13 +24,13 @@ def befunge_interpreter(grid: list[list[str]]) -> None:
 
     def move_ip() -> None:
         nonlocal ip_x, ip_y
-        if ip_direction == ip_directions[0]:
+        if ip_direction == _IP_DIRECTIONS[0]:
             ip_x = (ip_x + 1) % len(grid[ip_y])
-        elif ip_direction == ip_directions[1]:
+        elif ip_direction == _IP_DIRECTIONS[1]:
             ip_x = (ip_x - 1) % len(grid[ip_y])
-        elif ip_direction == ip_directions[2]:
+        elif ip_direction == _IP_DIRECTIONS[2]:
             ip_y = (ip_y - 1) % len(grid)
-        elif ip_direction == ip_directions[3]:
+        elif ip_direction == _IP_DIRECTIONS[3]:
             ip_y = (ip_y + 1) % len(grid)
 
     def interpret(instruction: str) -> None:
@@ -44,16 +44,16 @@ def befunge_interpreter(grid: list[list[str]]) -> None:
             pass
 
         elif instruction == ">":
-            ip_direction = ip_directions[0]
+            ip_direction = _IP_DIRECTIONS[0]
 
         elif instruction == "<":
-            ip_direction = ip_directions[1]
+            ip_direction = _IP_DIRECTIONS[1]
 
         elif instruction == "^":
-            ip_direction = ip_directions[2]
+            ip_direction = _IP_DIRECTIONS[2]
 
         elif instruction == "v":
-            ip_direction = ip_directions[3]
+            ip_direction = _IP_DIRECTIONS[3]
 
         elif instruction.isdigit():
             stack.append(int(instruction))
@@ -97,23 +97,23 @@ def befunge_interpreter(grid: list[list[str]]) -> None:
 
         elif instruction == "?":
             # PICK ANY DIRECTION
-            ip_direction = ip_directions[randint(0, 3)]
+            ip_direction = _IP_DIRECTIONS[randint(0, 3)]
 
         elif instruction == "_":
             # POP; RIGHT IF 0, LEFT OTHERWISE
             value = safe_pop()
             if value == 0:
-                ip_direction = ip_directions[0]
+                ip_direction = _IP_DIRECTIONS[0]
             else:
-                ip_direction = ip_directions[1]
+                ip_direction = _IP_DIRECTIONS[1]
 
         elif instruction == "|":
             # POP; DOWN IF 0, UP OTHERWISE
             value = stack.pop()
             if value == 0:
-                ip_direction = ip_directions[3]
+                ip_direction = _IP_DIRECTIONS[3]
             else:
-                ip_direction = ip_directions[3]
+                ip_direction = _IP_DIRECTIONS[3]
 
         elif instruction == "\"":
             # STRING MODE
@@ -172,7 +172,7 @@ def befunge_interpreter(grid: list[list[str]]) -> None:
             stack.append(ord(input("Enter a character: ")))
 
     def step() -> None:
-        if grid[ip_y][ip_x] == end_program: return
+        if grid[ip_y][ip_x] == _END_PROGRAM: return
         interpret(grid[ip_y][ip_x])
         move_ip()
         step()
@@ -183,7 +183,7 @@ def befunge_interpreter(grid: list[list[str]]) -> None:
 def main() -> None:
     parser = argparse.ArgumentParser(prog="Befunge interpreter")
     parser.add_argument("filename", type=str, help="Befunge file to interpret")
-    parser.add_argument("-g", "--grid", action="store_true", help="show interpreted gird")
+    parser.add_argument("-g", "--grid", action="store_true", help="show interpreted grid")
     args = parser.parse_args()
     grid = parse_befunge_file(args.filename)
     if args.grid: print(grid)
